@@ -413,33 +413,33 @@ world.afterEvents.playerButtonInput.subscribe((data) => {
     if (button === InputButton.Jump && newbutton === ButtonState.Pressed) {
         if (world.scoreboard.getObjective("detect:input_jump_pressed") !== undefined) {
             world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 1)
-            system.run(() => {
+            system.runTimeout(() => {
                 world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 0)
-            })
+            }, 1)
         }
     }
     if (button === InputButton.Jump && newbutton === ButtonState.Released) {
         if (world.scoreboard.getObjective("detect:input_jump_released") !== undefined) {
             world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 1)
-            system.run(() => {
+            system.runTimeout(() => {
                 world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 0)
-            })
+            }, 1)
         }
     }
     if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
         if (world.scoreboard.getObjective("detect:input_sneak_pressed") !== undefined) {
             world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 1)
-            system.run(() => {
+            system.runTimeout(() => {
                 world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 0)
-            })
+            }, 1)
         }
     }
     if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
         if (world.scoreboard.getObjective("detect:input_sneak_released") !== undefined) {
             world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 1)
-            system.run(() => {
+            system.runTimeout(() => {
                 world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 0)
-            })
+            }, 1)
         }
     }
 })
