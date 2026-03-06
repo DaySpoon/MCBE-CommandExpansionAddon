@@ -14,4 +14,10 @@
 - 本アドオンはbeta版のmoduleを使用しているため、最新アプデで変更があった際はアプデ対応が遅れる可能性があります。
 - 二次配布・自作発言の禁止
 
+## wiki
+一部コマンドについて分からない人もいると思うので、wikiを作りました。
+- wikiはこちらから: [wikiのページ](https://github.com/DaySpoon/MCBE-CommandExpansionAddon/wiki)
+
 ## ダウンロード
+- 最新版のダウンロード(github): [ダウンロード](https://github.com/DaySpoon/MCBE-CommandExpansionAddon/releases/latest)
+- 最新版のダウンロード(クラフターズコロニー) [ダウンロードページへ](https://minecraft-mcworld.com/207798/)
