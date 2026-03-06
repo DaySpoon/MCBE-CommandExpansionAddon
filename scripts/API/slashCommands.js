@@ -363,8 +363,8 @@ system.beforeEvents.startup.subscribe((data) => {
     }, (origin, targets, param, xr, zr, wr) => {
         if (param === "add" || param === "rotation") {
             if (targets.length) {
-                try {
-                    system.run(() => {
+                system.run(() => {
+                    try {
                         for (const entity of targets) {
                             if (entity instanceof Entity) {
                                 if (param === "add") {
@@ -376,8 +376,8 @@ system.beforeEvents.startup.subscribe((data) => {
                                 }
                             }
                         }
-                    })
-                } catch (e) { }
+                    } catch (e) { }
+                })
                 return {
                     status: CustomCommandStatus.Success,
                     message: `${display(targets, 10, "体")}のエンティティをノックバックさせました`
