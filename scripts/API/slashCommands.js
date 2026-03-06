@@ -1418,7 +1418,7 @@ system.beforeEvents.startup.subscribe((data) => {
                                 const scoreboard = world.scoreboard.getObjective("detect:dimension")
                                 if (dim.id === "minecraft:nether") scoreboard.setScore(entity, 0)
                                 if (dim.id === "minecraft:overworld") scoreboard.setScore(entity, 1)
-                                if (dim.id === "minecraft:end") scoreboard.setScore(entity, 2)
+                                if (dim.id === "minecraft:the_end") scoreboard.setScore(entity, 2)
                             }
                             else if (detect === "total_exp") {
                                 const total = entity.getTotalXp()
