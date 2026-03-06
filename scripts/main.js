@@ -1,6 +1,6 @@
 import { beforeEvents } from "@minecraft/server-admin"
 import "./API/slashCommands"
-import { InputMode, system, world } from "@minecraft/server"
+import { ButtonState, InputButton, InputMode, system, world } from "@minecraft/server"
 import { globalIds } from "./API/lib/karageAPI"
 import playerDropBeforeEvent from "./API/lib/events/playerDropBeforeEvent"
 import playerUseChestBeforeEvent from "./API/lib/events/playerUseChestBeforeEvent"
@@ -402,6 +402,44 @@ world.afterEvents.weatherChange.subscribe((data) => {
         }
         else {
             scoreboard.setScore("new", 2)
+        }
+    }
+})
+
+world.afterEvents.playerButtonInput.subscribe((data) => {
+    const sender = data.player
+    const button = data.button
+    const newbutton = data.newButtonState
+    if (button === InputButton.Jump && newbutton === ButtonState.Pressed) {
+        if (world.scoreboard.getObjective("detect:input_jump_pressed") !== undefined) {
+            world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 1)
+            system.runTimeout(() => {
+                world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 0)
+            }, 2)
+        }
+    }
+    if (button === InputButton.Jump && newbutton === ButtonState.Released) {
+        if (world.scoreboard.getObjective("detect:input_jump_released") !== undefined) {
+            world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 1)
+            system.runTimeout(() => {
+                world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 0)
+            }, 2)
+        }
+    }
+    if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
+        if (world.scoreboard.getObjective("detect:input_sneak_pressed") !== undefined) {
+            world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 1)
+            system.runTimeout(() => {
+                world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 0)
+            }, 2)
+        }
+    }
+    if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
+        if (world.scoreboard.getObjective("detect:input_sneak_released") !== undefined) {
+            world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 1)
+            system.runTimeout(() => {
+                world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 0)
+            }, 2)
         }
     }
 })
