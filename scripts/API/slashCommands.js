@@ -28,7 +28,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerEnum("xs:moveToLocationOption", ["move_to_block", "move_to_location", "navigate_to_block", "navigate_to_location", "navigate_to_locations", "lookat_block", "interact_block", "break_block"])
     command.registerEnum("xs:entityOption", ["navigate_to_entity", "attack_entity", "interact_entity", "lookat_entity"])
     command.registerEnum("xs:stopOption", ["breaking_block", "build", "interacting", "flying", "gliding", "moving", "swimming", "using_item", "sneaking"])
-    command.registerEnum("xs:startOption", ["build", "jump", "sneak", "interact", "fly", "glide", "swim", "use_item_in_slot", "use_item_in_slot_on_block", "respawn", "disconnect"])
+    command.registerEnum("xs:startOption", ["build", "jump", "sneak", "interact", "fly", "glide", "swim", "use_item_in_slot", "use_item_in_slot_on_block", "respawn"])
     command.registerEnum("xs:weaponSlot", ["mainhand", "offhand", "head", "feet", "chest", "legs", "full_armor"])
 
     command.registerCommand({
@@ -411,7 +411,7 @@ system.beforeEvents.startup.subscribe((data) => {
                         for (const entity of targets) {
                             if (entity instanceof Entity) {
                                 if (param === "set") {
-                                    
+
                                     entity.applyImpulse({ x: xr, y: yr, z: zr })
                                 }
                                 if (param === "rotation") {
@@ -425,7 +425,7 @@ system.beforeEvents.startup.subscribe((data) => {
                                     else entity.applyImpulse({ x: xr * x, y: yr * y, z: zr * z })
                                 }
                                 if (param === "pos") {
-                                    entity.applyImpulse({ x: 1/5 * (xr - entity.location.x), y: 1/5 * (yr - entity.location.y), z: 1/5 * (zr - entity.location.z) })
+                                    entity.applyImpulse({ x: 1 / 5 * (xr - entity.location.x), y: 1 / 5 * (yr - entity.location.y), z: 1 / 5 * (zr - entity.location.z) })
                                 }
                                 if (param === "direction") {
                                     if (entities.length) {
@@ -2591,7 +2591,7 @@ system.beforeEvents.startup.subscribe((data) => {
         optionalParameters: [{ name: "slot", type: CustomCommandParamType.Integer }, { name: "location", type: CustomCommandParamType.Location }]
     }, (origin, targets, option, slot, location) => {
         if (targets.length) {
-            const gamemodes = ["build", "sneak", "interact", "jump", "fly", "glide", "swim", "use_item_in_slot", "use_item_in_slot_on_block", "respawn", "disconnect"]
+            const gamemodes = ["build", "sneak", "interact", "jump", "fly", "glide", "swim", "use_item_in_slot", "use_item_in_slot_on_block", "respawn"]
             if (gamemodes.includes(option)) {
                 if (option === "build") {
                     system.run(() => {
@@ -2676,23 +2676,6 @@ system.beforeEvents.startup.subscribe((data) => {
                     return {
                         status: CustomCommandStatus.Success,
                         message: `${display(targets, 10, "体")}をリスポーンさせました`
-                    }
-                }
-                if (option === "disconnect") {
-                    system.run(() => {
-                        try {
-                            for (const target of targets) {
-                                if (target instanceof SimulatedPlayer) {
-                                    if (target.getDynamicProperty("bot")) {
-                                        target.disconnect()
-                                    }
-                                }
-                            }
-                        } catch (e) { }
-                    })
-                    return {
-                        status: CustomCommandStatus.Success,
-                        message: `${display(targets, 10, "体")}の接続を切断しました`
                     }
                 }
                 if (option === "fly") {
@@ -2790,6 +2773,36 @@ system.beforeEvents.startup.subscribe((data) => {
             else return {
                 status: CustomCommandStatus.Failure,
                 message: `引数が存在しません`
+            }
+        }
+        else return {
+            status: CustomCommandStatus.Failure,
+            message: `対象のエンティティが存在しません`
+        }
+    })
+
+    command.registerCommand({
+        name: "xs:disconnect",
+        description: "接続を切断します",
+        permissionLevel: CommandPermissionLevel.GameDirectors,
+        mandatoryParameters: [{ name: "target", type: CustomCommandParamType.PlayerSelector }],
+        optionalParameters: []
+    }, (origin, targets) => {
+        if (targets.length) {
+            system.run(() => {
+                try {
+                    for (const target of targets) {
+                        if (target instanceof SimulatedPlayer) {
+                            if (target.getDynamicProperty("bot")) {
+                                target.disconnect()
+                            }
+                        }
+                    }
+                } catch (e) { }
+            })
+            return {
+                status: CustomCommandStatus.Success,
+                message: `${display(targets, 10, "体")}の接続を切断しました`
             }
         }
         else return {
