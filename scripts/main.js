@@ -153,6 +153,9 @@ playerMoveAfterEvent.subscribe((data) => {
         if (keys.includes(PlayerInputKey.SPACE)) sp = 1;
         let sum = Number(`2` + `${w}` + `${a}` + `${s}` + `${d}` + `${sh}` + `${sp}`)
         scoreboard.setScore(sender, sum)
+        system.runTimeout(() => {
+            world.scoreboard.getObjective("detect:keys").setScore(sender, 2000000)
+        }, 1)
     }
 })
 
@@ -160,9 +163,9 @@ world.afterEvents.playerSwingStart.subscribe((data) => {
     const sender = data.player
     if (world.scoreboard.getObjective("detect:swing") !== undefined) {
         world.scoreboard.getObjective("detect:swing").setScore(sender, 1)
-        system.run(() => {
+        system.runTimeout(() => {
             world.scoreboard.getObjective("detect:swing").setScore(sender, 0)
-        })
+        }, 1)
     }
 })
 
@@ -349,17 +352,17 @@ world.afterEvents.entityDie.subscribe((data) => {
         if (world.scoreboard.getObjective("detect:dead")) {
             const scoreboard = world.scoreboard.getObjective("detect:dead")
             scoreboard.setScore(sender, 1)
-            system.run(() => {
+            system.runTimeout(() => {
                 scoreboard.setScore(sender, 0)
-            })
+            }, 1)
         }
         if (killer !== undefined) {
             if (world.scoreboard.getObjective("detect:kill")) {
                 const scoreboard = world.scoreboard.getObjective("detect:kill")
                 scoreboard.setScore(sender, 1)
-                system.run(() => {
+                system.runTimeout(() => {
                     scoreboard.setScore(sender, 0)
-                })
+                }, 1)
             }
         }
     }
@@ -369,9 +372,9 @@ world.afterEvents.entityDie.subscribe((data) => {
                 try {
                     const scoreboard = world.scoreboard.getObjective("detect:entity_kill")
                     scoreboard.setScore(sender, 1)
-                    system.run(() => {
+                    system.runTimeout(() => {
                         scoreboard.setScore(sender, 0)
-                    })
+                    }, 1)
                 } catch (e) {
 
                 }
