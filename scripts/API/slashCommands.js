@@ -1865,7 +1865,7 @@ system.beforeEvents.startup.subscribe((data) => {
                                             const item = inventory.container.getItem(slot)
                                             if (item !== undefined) {
                                                 item.nameTag = text.replace(/\\n/g, "\n").replace(/#n/g, " ")
-                                                if (text2 !== undefined) item.setLore(text2.replace(/#n/g, " ").split("\n"))
+                                                if (text2 !== undefined) item.setLore(text2.replace(/#n/g, " ").split("\\n"))
                                                 inventory.container.setItem(slot, item)
                                             }
                                         }
@@ -1889,7 +1889,7 @@ system.beforeEvents.startup.subscribe((data) => {
                                         const item = inventory.container.getItem(slot)
                                         if (slot <= inventory.container.size) {
                                             if (item !== undefined) {
-                                                item.setLore(text.replace(/#n/g, " ").split("\n"))
+                                                item.setLore(text.replace(/#n/g, " ").split("\\n"))
                                                 if (text2 !== undefined) item.nameTag = text2.replace(/\\n/g, "\n").replace(/#n/g, " ")
                                                 inventory.container.setItem(slot, item)
                                             }
