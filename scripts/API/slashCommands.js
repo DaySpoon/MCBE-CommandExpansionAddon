@@ -30,6 +30,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerEnum("xs:stopOption", ["breaking_block", "build", "interacting", "flying", "gliding", "moving", "swimming", "using_item", "sneaking"])
     command.registerEnum("xs:startOption", ["build", "jump", "sneak", "interact", "fly", "glide", "swim", "use_item_in_slot", "use_item_in_slot_on_block", "respawn"])
     command.registerEnum("xs:weaponSlot", ["mainhand", "offhand", "head", "feet", "chest", "legs", "full_armor"])
+    command.registerEnum("xs:itemOption", ["nametag", "lore"])
 
     command.registerCommand({
         name: "xs:clearchat",
@@ -51,7 +52,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:inventory",
         description: "インベントリを保存,読み込みします",
-        permissionLevel: CommandPermissionLevel.Host,
+        permissionLevel: CommandPermissionLevel.Owner,
         mandatoryParameters: [{ name: "player", type: CustomCommandParamType.PlayerSelector }, { name: "xs:inventoryOperation", type: CustomCommandParamType.Enum }]
     }, (origin, selectors, param) => {
         if (param === "write" || param === "load" || param === "change") {
@@ -90,7 +91,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:placer",
         description: "空中にブロックを設置します",
-        permissionLevel: CommandPermissionLevel.Host,
+        permissionLevel: CommandPermissionLevel.Owner,
         optionalParameters: [{ name: "position", type: CustomCommandParamType.Location }, { name: "breakTime", type: CustomCommandParamType.Float }],
         mandatoryParameters: []
     }, (origin, location, time) => {
@@ -1844,6 +1845,71 @@ system.beforeEvents.startup.subscribe((data) => {
     })
 
     command.registerCommand({
+        name: "xs:item",
+        description: "アイテムの状態を変更します",
+        permissionLevel: CommandPermissionLevel.GameDirectors,
+        mandatoryParameters: [{ name: "entity", type: CustomCommandParamType.EntitySelector }, { name: "slot", type: CustomCommandParamType.Integer }, { name: "xs:itemOption", type: CustomCommandParamType.Enum }, { name: "text", type: CustomCommandParamType.String }],
+        optionalParameters: [{ name: "lore|nametag", type: CustomCommandParamType.String }]
+    }, (origin, entities, slot, option, text, text2) => {
+        const sender = origin.sourceEntity
+        if (entities.length) {
+            if (option === "nametag" || option === "lore") {
+                if (option === "nametag") {
+                    system.run(() => {
+                        try {
+                            for (const entity of entities) {
+                                if (entity instanceof Entity) {
+                                    if (entity.getComponent("inventory")) {
+                                        const inventory = entity.getComponent("inventory")
+                                        const item = inventory.container.getItem(slot)
+                                        if (item !== undefined) {
+                                            item.nameTag = text.replace(/\\n/g, "\n").replace(/#n/g, " ")
+                                            if (text2 !== undefined) item.setLore(text2.replace(/\\n/g, "\n").replace(/#n/g, " ").split("\n"))
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (e) { }
+                    })
+                    return {
+                        status: CustomCommandStatus.Success,
+                        message: `${display(entities, 10, "体")}のスロット${slot}のアイテムの状態を変更しました`
+                    }
+                }
+                else if (option === "lore") {
+                    system.run(() => {
+                        try {
+                            for (const entity of entities) {
+                                if (entity instanceof Entity) {
+                                    if (entity.getComponent("inventory")) {
+                                        const inventory = entity.getComponent("inventory")
+                                        const item = inventory.container.getItem(slot)
+                                        if (item !== undefined) {
+                                            item.setLore(text.replace(/\\n/g, "\n").replace(/#n/g, " ").split("\n"))
+                                            if (text2 !== undefined) item.nameTag = text2.replace(/\\n/g, "\n").replace(/#n/g, " ")
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (e) { }
+                    })
+                    return {
+                        status: CustomCommandStatus.Success,
+                        message: `${display(entities, 10, "体")}のスロット${slot}のアイテムの状態を変更しました`
+                    }
+                }
+            }
+            else return {
+                status: CustomCommandStatus.Failure,
+                message: `その引数は存在しません`
+            }
+        } else return {
+            status: CustomCommandStatus.Failure,
+            message: `対象のエンティティが存在しません`
+        }
+    })
+
+    command.registerCommand({
         name: "xs:heal",
         description: "体力を回復します",
         permissionLevel: CommandPermissionLevel.GameDirectors,
@@ -2550,7 +2616,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:bot-skin",
         description: "botのskinを変更します",
-        permissionLevel: CommandPermissionLevel.Host,
+        permissionLevel: CommandPermissionLevel.Owner,
         mandatoryParameters: [{ name: "target", type: CustomCommandParamType.PlayerSelector }, { name: "targetPlayerSkin", type: CustomCommandParamType.PlayerSelector }],
         optionalParameters: []
     }, (origin, targets, players) => {
@@ -2814,7 +2880,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:js",
         description: "javascriptの実行",
-        permissionLevel: CommandPermissionLevel.Host,
+        permissionLevel: CommandPermissionLevel.Owner,
         mandatoryParameters: [{ name: "code", type: CustomCommandParamType.String }],
         optionalParameters: []
     }, (origin, code) => {
