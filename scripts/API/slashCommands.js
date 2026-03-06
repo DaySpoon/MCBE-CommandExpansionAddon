@@ -51,7 +51,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:inventory",
         description: "インベントリを保存,読み込みします",
-        permissionLevel: CommandPermissionLevel.Admin,
+        permissionLevel: CommandPermissionLevel.Host,
         mandatoryParameters: [{ name: "player", type: CustomCommandParamType.PlayerSelector }, { name: "xs:inventoryOperation", type: CustomCommandParamType.Enum }]
     }, (origin, selectors, param) => {
         if (param === "write" || param === "load" || param === "change") {
@@ -90,7 +90,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:placer",
         description: "空中にブロックを設置します",
-        permissionLevel: CommandPermissionLevel.Admin,
+        permissionLevel: CommandPermissionLevel.Host,
         optionalParameters: [{ name: "position", type: CustomCommandParamType.Location }, { name: "breakTime", type: CustomCommandParamType.Float }],
         mandatoryParameters: []
     }, (origin, location, time) => {
@@ -2550,7 +2550,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:bot-skin",
         description: "botのskinを変更します",
-        permissionLevel: CommandPermissionLevel.Admin,
+        permissionLevel: CommandPermissionLevel.Host,
         mandatoryParameters: [{ name: "target", type: CustomCommandParamType.PlayerSelector }, { name: "targetPlayerSkin", type: CustomCommandParamType.PlayerSelector }],
         optionalParameters: []
     }, (origin, targets, players) => {
@@ -2814,7 +2814,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerCommand({
         name: "xs:js",
         description: "javascriptの実行",
-        permissionLevel: CommandPermissionLevel.Admin,
+        permissionLevel: CommandPermissionLevel.Host,
         mandatoryParameters: [{ name: "code", type: CustomCommandParamType.String }],
         optionalParameters: []
     }, (origin, code) => {
