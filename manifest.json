@@ -1,0 +1,70 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "§l§2Command Expansion",
+		"description": "製作者: DaySpoonKara (DaySpからあげ)\n更なる便利・操作コマンドを増やします。",
+		"min_engine_version": [
+			1,
+			20,
+			0
+		],
+		"uuid": "a92fca5e-68cc-4181-9453-16a00579aafe",
+		"version": [
+			1,
+			0,
+			0
+		]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "83166e62-ff21-4cf2-80bb-47f366704096",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"description": "javascript",
+			"type": "script",
+			"language": "javascript",
+			"uuid": "1540a2b8-cbcc-4ae7-92f2-22facbba24ad",
+			"entry": "scripts/main.js",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	],
+	"capabilities": [
+		"script_eval"
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "beta"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "beta"
+		},
+		{
+			"module_name": "@minecraft/server-gametest",
+			"version": "beta"
+		},
+		// {
+		// 	"module_name": "@minecraft/server-net",
+		// 	"version": "beta"
+		// },
+		{
+			"module_name": "@minecraft/server-admin",
+			"version": "beta"
+		},
+		{
+			"module_name": "@minecraft/debug-utilities",
+			"version": "beta"
+		}
+	]
+}
