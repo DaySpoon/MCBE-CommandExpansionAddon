@@ -411,6 +411,7 @@ system.beforeEvents.startup.subscribe((data) => {
                         for (const entity of targets) {
                             if (entity instanceof Entity) {
                                 if (param === "set") {
+                                    
                                     entity.applyImpulse({ x: xr, y: yr, z: zr })
                                 }
                                 if (param === "rotation") {
@@ -424,7 +425,7 @@ system.beforeEvents.startup.subscribe((data) => {
                                     else entity.applyImpulse({ x: xr * x, y: yr * y, z: zr * z })
                                 }
                                 if (param === "pos") {
-                                    entity.applyImpulse({ x: xr - entity.location.x, y: yr - entity.location.y, z: zr - entity.location.z })
+                                    entity.applyImpulse({ x: 1/5 * (xr - entity.location.x), y: 1/2 * (yr - entity.location.y), z: 1/5 * (zr - entity.location.z) })
                                 }
                                 if (param === "direction") {
                                     if (entities.length) {
@@ -1958,8 +1959,8 @@ system.beforeEvents.startup.subscribe((data) => {
                 system.run(() => {
                     const bot = spawnSimulatedPlayer({ dimension: entity.dimension, ...location }, name ?? "bot", gamemoder)
                     if (bot instanceof SimulatedPlayer) {
-                        bot.addTag("ex:bot")
                         bot.setDynamicProperty("bot", true)
+                        bot.addTag("ex:bot")
                         let s = system.runInterval(() => {
                             try {
                                 const health = bot.getComponent("health").currentValue
