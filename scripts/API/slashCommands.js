@@ -425,7 +425,7 @@ system.beforeEvents.startup.subscribe((data) => {
                                     else entity.applyImpulse({ x: xr * x, y: yr * y, z: zr * z })
                                 }
                                 if (param === "pos") {
-                                    entity.applyImpulse({ x: 1/5 * (xr - entity.location.x), y: 1/2 * (yr - entity.location.y), z: 1/5 * (zr - entity.location.z) })
+                                    entity.applyImpulse({ x: 1/5 * (xr - entity.location.x), y: 1/5 * (yr - entity.location.y), z: 1/5 * (zr - entity.location.z) })
                                 }
                                 if (param === "direction") {
                                     if (entities.length) {
