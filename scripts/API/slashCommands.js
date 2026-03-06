@@ -1958,6 +1958,7 @@ system.beforeEvents.startup.subscribe((data) => {
                 system.run(() => {
                     const bot = spawnSimulatedPlayer({ dimension: entity.dimension, ...location }, name ?? "bot", gamemoder)
                     if (bot instanceof SimulatedPlayer) {
+                        bot.addTag("ex:bot")
                         bot.setDynamicProperty("bot", true)
                         let s = system.runInterval(() => {
                             try {
