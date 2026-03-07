@@ -5,6 +5,10 @@ import { globalIds } from "./API/lib/karageAPI"
 import playerDropBeforeEvent from "./API/lib/events/playerDropBeforeEvent"
 import playerUseChestBeforeEvent from "./API/lib/events/playerUseChestBeforeEvent"
 import playerMoveAfterEvent, { PlayerInputKey } from "./API/lib/events/playerMoveAfterEvent"
+import playerFishingAfterEvent from "./API/lib/events/playerFishingAfterEvent"
+import playerXpChangeAfterEvent from "./API/lib/events/playerXpChangeAfterEvent"
+import playerRideAfterEvent from "./API/lib/events/playerRideAfterEvent"
+import playerGetOffAfterEvent from "./API/lib/events/playerGetOffAfterEvent"
 
 system.run(() => {
     const result = beforeEvents.asyncPlayerJoin.subscribe((data) => {
@@ -60,6 +64,7 @@ system.run(() => {
 })
 
 world.afterEvents.playerSpawn.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (data.initialSpawn) {
         const data = new globalIds("playerData", { name: sender.name, id: sender.id })
@@ -82,26 +87,31 @@ world.afterEvents.playerSpawn.subscribe((data) => {
                 sender.nameTag = nick.nick.replace(/\\n/g, "\n").replace(/#n/g, " ")
             }
         }
-        if (world.scoreboard.getObjective("detect:login")) {
-            const scoreboard = world.scoreboard.getObjective("detect:login")
-            scoreboard.setScore(sender, 1)
-            system.run(() => {
-                scoreboard.setScore(sender, 0)
-            })
+        if (pack["command:detect_scoreboard"] === true) {
+            if (world.scoreboard.getObjective("detect:login")) {
+                const scoreboard = world.scoreboard.getObjective("detect:login")
+                scoreboard.setScore(sender, 1)
+                system.run(() => {
+                    scoreboard.setScore(sender, 0)
+                })
+            }
         }
     }
     else {
-        if (world.scoreboard.getObjective("detect:spawn")) {
-            const scoreboard = world.scoreboard.getObjective("detect:spawn")
-            scoreboard.setScore(sender, 1)
-            system.run(() => {
-                scoreboard.setScore(sender, 0)
-            })
+        if (pack["command:detect_scoreboard"] === true) {
+            if (world.scoreboard.getObjective("detect:spawn")) {
+                const scoreboard = world.scoreboard.getObjective("detect:spawn")
+                scoreboard.setScore(sender, 1)
+                system.run(() => {
+                    scoreboard.setScore(sender, 0)
+                })
+            }
         }
     }
 })
 
 world.beforeEvents.chatSend.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.sender
     if (sender.getDynamicProperty("nick") !== undefined) {
         const nick = JSON.parse(sender.getDynamicProperty("nick"))
@@ -116,14 +126,16 @@ world.beforeEvents.chatSend.subscribe((data) => {
             }
         }
     }
-    if (world.scoreboard.getObjective("detect:chat")) {
-        const scoreboard = world.scoreboard.getObjective("detect:chat")
-        system.run(() => {
-            scoreboard.setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:chat")) {
+            const scoreboard = world.scoreboard.getObjective("detect:chat")
             system.run(() => {
-                scoreboard.setScore(sender, 0)
+                scoreboard.setScore(sender, 1)
+                system.run(() => {
+                    scoreboard.setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
@@ -132,44 +144,219 @@ world.beforeEvents.chatSend.subscribe((data) => {
 この下イベント検知・キャンセル
 
 */
+world.afterEvents.worldLoad.subscribe((data) => {
+    const pack = world.getPackSettings()
+    if (pack["command:detect_scoreboard"] === true) {
+        playerFishingAfterEvent.subscribe((data) => {
+            const sender = data.player
+            const entity = data.itemEntity
+            if (world.scoreboard.getObjective("detect:fishing") !== undefined) {
+                world.scoreboard.getObjective("detect:fishing").setScore(sender, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:fishing").setScore(sender, 0)
+                }, 1)
+            }
+            if (world.scoreboard.getObjective("detect:fishing_result") !== undefined) {
+                if (data.result) world.scoreboard.getObjective("detect:fishing_result").setScore(sender, 1)
+                else world.scoreboard.getObjective("detect:fishing_result").setScore(sender, 0)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:fishing_result").setScore(sender, -1)
+                }, 1)
+            }
+            if (entity !== undefined) {
+                if (world.scoreboard.getObjective("detect:fishing_item") !== undefined) {
+                    world.scoreboard.getObjective("detect:fishing_item").setScore(sender, 1)
+                    system.runTimeout(() => {
+                        world.scoreboard.getObjective("detect:fishing_item").setScore(sender, 0)
+                    }, 1)
+                }
+            }
+        })
+        playerXpChangeAfterEvent.subscribe((data) => {
+            const sender = data.player
+            const xp = data.xp
+            if (world.scoreboard.getObjective("detect:xp_change") !== undefined) {
+                world.scoreboard.getObjective("detect:xp_change").setScore(sender, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:xp_change").setScore(sender, 0)
+                }, 1)
+            }
+            if (world.scoreboard.getObjective("detect:xp_change_num") !== undefined) {
+                world.scoreboard.getObjective("detect:xp_change_num").setScore(sender, xp)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:xp_change_num").setScore(sender, 0)
+                }, 1)
+            }
+        })
+        playerRideAfterEvent.subscribe((data) => {
+            const sender = data.player
+            const entity = data.entity
+            if (world.scoreboard.getObjective("detect:ride") !== undefined) {
+                world.scoreboard.getObjective("detect:ride").setScore(sender, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:ride").setScore(sender, 0)
+                }, 1)
+            }
+            if (world.scoreboard.getObjective("detect:ride_entity") !== undefined) {
+                world.scoreboard.getObjective("detect:ride_entity").setScore(entity, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:ride_entity").setScore(entity, 0)
+                }, 1)
+            }
+        })
+        playerGetOffAfterEvent.subscribe((data) => {
+            const sender = data.player
+            const entity = data.entity
+            if (world.scoreboard.getObjective("detect:getoff") !== undefined) {
+                world.scoreboard.getObjective("detect:getoff").setScore(sender, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:getoff").setScore(sender, 0)
+                }, 1)
+            }
+            if (world.scoreboard.getObjective("detect:getoff_entity") !== undefined) {
+                world.scoreboard.getObjective("detect:getoff_entity").setScore(entity, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:getoff_entity").setScore(entity, 0)
+                }, 1)
+            }
+        })
+        playerMoveAfterEvent.subscribe((data) => {
+            const sender = data.player
+            const keys = data.keys
+            const first = data.firstKeys
+            if (world.scoreboard.getObjective("detect:keys")) {
+                let w = 0;
+                let a = 0;
+                let s = 0;
+                let d = 0;
+                let sh = 0;
+                let sp = 0;
+                const scoreboard = world.scoreboard.getObjective("detect:keys")
+                if (keys.includes(PlayerInputKey.W)) w = 1;
+                if (keys.includes(PlayerInputKey.A)) a = 1;
+                if (keys.includes(PlayerInputKey.S)) s = 1;
+                if (keys.includes(PlayerInputKey.D)) d = 1;
+                if (keys.includes(PlayerInputKey.SHIFT)) sh = 1;
+                if (keys.includes(PlayerInputKey.SPACE)) sp = 1;
+                let sum = Number(`2` + `${w}` + `${a}` + `${s}` + `${d}` + `${sh}` + `${sp}`)
+                scoreboard.setScore(sender, sum)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:keys").setScore(sender, 2000000)
+                }, 1)
+            }
+        })
+        world.afterEvents.playerSwingStart.subscribe((data) => {
+            const sender = data.player
+            if (world.scoreboard.getObjective("detect:swing") !== undefined) {
+                world.scoreboard.getObjective("detect:swing").setScore(sender, 1)
+                system.runTimeout(() => {
+                    world.scoreboard.getObjective("detect:swing").setScore(sender, 0)
+                }, 1)
+            }
+        })
+        world.afterEvents.entityDie.subscribe((data) => {
+            const sender = data.deadEntity
+            const killer = data.damageSource.damagingEntity
+            if (sender.typeId === "minecraft:player") {
+                if (world.scoreboard.getObjective("detect:dead")) {
+                    const scoreboard = world.scoreboard.getObjective("detect:dead")
+                    scoreboard.setScore(sender, 1)
+                    system.runTimeout(() => {
+                        scoreboard.setScore(sender, 0)
+                    }, 1)
+                }
+                if (killer !== undefined) {
+                    if (world.scoreboard.getObjective("detect:kill")) {
+                        const scoreboard = world.scoreboard.getObjective("detect:kill")
+                        scoreboard.setScore(sender, 1)
+                        system.runTimeout(() => {
+                            scoreboard.setScore(sender, 0)
+                        }, 1)
+                    }
+                }
+            }
+            else {
+                if (killer !== undefined) {
+                    if (world.scoreboard.getObjective("detect:entity_kill")) {
+                        try {
+                            const scoreboard = world.scoreboard.getObjective("detect:entity_kill")
+                            scoreboard.setScore(sender, 1)
+                            system.runTimeout(() => {
+                                scoreboard.setScore(sender, 0)
+                            }, 1)
+                        } catch (e) {
 
-playerMoveAfterEvent.subscribe((data) => {
-    const sender = data.player
-    const keys = data.keys
-    const first = data.firstKeys
-    if (world.scoreboard.getObjective("detect:keys")) {
-        let w = 0;
-        let a = 0;
-        let s = 0;
-        let d = 0;
-        let sh = 0;
-        let sp = 0;
-        const scoreboard = world.scoreboard.getObjective("detect:keys")
-        if (keys.includes(PlayerInputKey.W)) w = 1;
-        if (keys.includes(PlayerInputKey.A)) a = 1;
-        if (keys.includes(PlayerInputKey.S)) s = 1;
-        if (keys.includes(PlayerInputKey.D)) d = 1;
-        if (keys.includes(PlayerInputKey.SHIFT)) sh = 1;
-        if (keys.includes(PlayerInputKey.SPACE)) sp = 1;
-        let sum = Number(`2` + `${w}` + `${a}` + `${s}` + `${d}` + `${sh}` + `${sp}`)
-        scoreboard.setScore(sender, sum)
-        system.runTimeout(() => {
-            world.scoreboard.getObjective("detect:keys").setScore(sender, 2000000)
-        }, 1)
+                        }
+                    }
+                }
+            }
+        })
+        world.afterEvents.weatherChange.subscribe((data) => {
+            const previous = data.previousWeather
+            const news = data.newWeather
+            if (world.scoreboard.getObjective("detect:weather")) {
+                const scoreboard = world.scoreboard.getObjective("detect:weather")
+                if (previous === "Clear") {
+                    scoreboard.setScore("previous", 0)
+                }
+                else if (previous === "Rain") {
+                    scoreboard.setScore("previous", 1)
+                }
+                else {
+                    scoreboard.setScore("previous", 2)
+                }
+                if (news === "Clear") {
+                    scoreboard.setScore("new", 0)
+                }
+                else if (news === "Rain") {
+                    scoreboard.setScore("new", 1)
+                }
+                else {
+                    scoreboard.setScore("new", 2)
+                }
+            }
+        })
+        world.afterEvents.playerButtonInput.subscribe((data) => {
+            const sender = data.player
+            const button = data.button
+            const newbutton = data.newButtonState
+            if (button === InputButton.Jump && newbutton === ButtonState.Pressed) {
+                if (world.scoreboard.getObjective("detect:input_jump_pressed") !== undefined) {
+                    world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 1)
+                    system.runTimeout(() => {
+                        world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 0)
+                    }, 1)
+                }
+            }
+            if (button === InputButton.Jump && newbutton === ButtonState.Released) {
+                if (world.scoreboard.getObjective("detect:input_jump_released") !== undefined) {
+                    world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 1)
+                    system.runTimeout(() => {
+                        world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 0)
+                    }, 1)
+                }
+            }
+            if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
+                if (world.scoreboard.getObjective("detect:input_sneak_pressed") !== undefined) {
+                    world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 1)
+                    system.runTimeout(() => {
+                        world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 0)
+                    }, 1)
+                }
+            }
+            if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
+                if (world.scoreboard.getObjective("detect:input_sneak_released") !== undefined) {
+                    world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 1)
+                    system.runTimeout(() => {
+                        world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 0)
+                    }, 1)
+                }
+            }
+        })
     }
 })
-
-world.afterEvents.playerSwingStart.subscribe((data) => {
-    const sender = data.player
-    if (world.scoreboard.getObjective("detect:swing") !== undefined) {
-        world.scoreboard.getObjective("detect:swing").setScore(sender, 1)
-        system.runTimeout(() => {
-            world.scoreboard.getObjective("detect:swing").setScore(sender, 0)
-        }, 1)
-    }
-})
-
 playerDropBeforeEvent.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (sender.getDynamicProperty("minecraft:item_drop") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:item_drop")
@@ -177,17 +364,20 @@ playerDropBeforeEvent.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:item_drop") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:item_drop").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:item_drop") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:item_drop").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:item_drop").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:item_drop").setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
 playerUseChestBeforeEvent.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (sender.getDynamicProperty("minecraft:chest_use") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:chest_use")
@@ -195,17 +385,20 @@ playerUseChestBeforeEvent.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:chest_use") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:chest_use").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:chest_use") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:chest_use").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:chest_use").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:chest_use").setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
 world.beforeEvents.entityItemPickup.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.entity
     if (sender.getDynamicProperty("minecraft:pickup") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:pickup")
@@ -213,13 +406,15 @@ world.beforeEvents.entityItemPickup.subscribe((data) => {
             data.cancel = true;
         }
         else {
-            if (world.scoreboard.getObjective("detect:pickup") !== undefined) {
-                system.run(() => {
-                    world.scoreboard.getObjective("detect:pickup").setScore(sender, 1)
+            if (pack["command:detect_scoreboard"] === true) {
+                if (world.scoreboard.getObjective("detect:pickup") !== undefined) {
                     system.run(() => {
-                        world.scoreboard.getObjective("detect:pickup").setScore(sender, 0)
+                        world.scoreboard.getObjective("detect:pickup").setScore(sender, 1)
+                        system.run(() => {
+                            world.scoreboard.getObjective("detect:pickup").setScore(sender, 0)
+                        })
                     })
-                })
+                }
             }
         }
     }
@@ -236,6 +431,7 @@ world.beforeEvents.entityItemPickup.subscribe((data) => {
 })
 
 world.beforeEvents.itemUse.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.source
     if (sender.getDynamicProperty("minecraft:item_use") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:item_use")
@@ -243,17 +439,20 @@ world.beforeEvents.itemUse.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:item_use") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:item_use").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:item_use") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:item_use").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:item_use").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:item_use").setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
 world.beforeEvents.entityHurt.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.damageSource.damagingEntity ?? data.damageSource.damagingProjectile
     if (sender !== undefined) {
         if (sender.getDynamicProperty("minecraft:attack_entity") !== undefined) {
@@ -262,18 +461,21 @@ world.beforeEvents.entityHurt.subscribe((data) => {
                 data.cancel = true;
             }
         }
-        if (world.scoreboard.getObjective("detect:attack_entity") !== undefined) {
-            system.run(() => {
-                world.scoreboard.getObjective("detect:attack_entity").setScore(sender, 1)
+        if (pack["command:detect_scoreboard"] === true) {
+            if (world.scoreboard.getObjective("detect:attack_entity") !== undefined) {
                 system.run(() => {
-                    world.scoreboard.getObjective("detect:attack_entity").setScore(sender, 0)
+                    world.scoreboard.getObjective("detect:attack_entity").setScore(sender, 1)
+                    system.run(() => {
+                        world.scoreboard.getObjective("detect:attack_entity").setScore(sender, 0)
+                    })
                 })
-            })
+            }
         }
     }
 })
 
 world.beforeEvents.playerBreakBlock.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (sender.getDynamicProperty("minecraft:break") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:break")
@@ -281,17 +483,20 @@ world.beforeEvents.playerBreakBlock.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:break") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:break").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:break") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:break").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:break").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:break").setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
 world.beforeEvents.playerPlaceBlock.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (sender.getDynamicProperty("minecraft:place") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:place")
@@ -299,17 +504,20 @@ world.beforeEvents.playerPlaceBlock.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:place") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:place").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:place") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:place").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:place").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:place").setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
 world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (sender.getDynamicProperty("minecraft:interact_block") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:interact_block")
@@ -317,17 +525,20 @@ world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:interact_block") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:interact_block").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:interact_block") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:interact_block").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:interact_block").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:interact_block").setScore(sender, 0)
+                })
             })
-        })
+        }
     }
 })
 
 world.beforeEvents.playerInteractWithEntity.subscribe((data) => {
+    const pack = world.getPackSettings()
     const sender = data.player
     if (sender.getDynamicProperty("minecraft:interact_entiy") !== undefined) {
         const enable = sender.getDynamicProperty("minecraft:interact_entiy")
@@ -335,114 +546,14 @@ world.beforeEvents.playerInteractWithEntity.subscribe((data) => {
             data.cancel = true;
         }
     }
-    if (world.scoreboard.getObjective("detect:interact_entiy") !== undefined) {
-        system.run(() => {
-            world.scoreboard.getObjective("detect:interact_entiy").setScore(sender, 1)
+    if (pack["command:detect_scoreboard"] === true) {
+        if (world.scoreboard.getObjective("detect:interact_entiy") !== undefined) {
             system.run(() => {
-                world.scoreboard.getObjective("detect:interact_entiy").setScore(sender, 0)
+                world.scoreboard.getObjective("detect:interact_entiy").setScore(sender, 1)
+                system.run(() => {
+                    world.scoreboard.getObjective("detect:interact_entiy").setScore(sender, 0)
+                })
             })
-        })
-    }
-})
-
-world.afterEvents.entityDie.subscribe((data) => {
-    const sender = data.deadEntity
-    const killer = data.damageSource.damagingEntity
-    if (sender.typeId === "minecraft:player") {
-        if (world.scoreboard.getObjective("detect:dead")) {
-            const scoreboard = world.scoreboard.getObjective("detect:dead")
-            scoreboard.setScore(sender, 1)
-            system.runTimeout(() => {
-                scoreboard.setScore(sender, 0)
-            }, 1)
-        }
-        if (killer !== undefined) {
-            if (world.scoreboard.getObjective("detect:kill")) {
-                const scoreboard = world.scoreboard.getObjective("detect:kill")
-                scoreboard.setScore(sender, 1)
-                system.runTimeout(() => {
-                    scoreboard.setScore(sender, 0)
-                }, 1)
-            }
-        }
-    }
-    else {
-        if (killer !== undefined) {
-            if (world.scoreboard.getObjective("detect:entity_kill")) {
-                try {
-                    const scoreboard = world.scoreboard.getObjective("detect:entity_kill")
-                    scoreboard.setScore(sender, 1)
-                    system.runTimeout(() => {
-                        scoreboard.setScore(sender, 0)
-                    }, 1)
-                } catch (e) {
-
-                }
-            }
-        }
-    }
-})
-
-world.afterEvents.weatherChange.subscribe((data) => {
-    const previous = data.previousWeather
-    const news = data.newWeather
-    if (world.scoreboard.getObjective("detect:weather")) {
-        const scoreboard = world.scoreboard.getObjective("detect:weather")
-        if (previous === "Clear") {
-            scoreboard.setScore("previous", 0)
-        }
-        else if (previous === "Rain") {
-            scoreboard.setScore("previous", 1)
-        }
-        else {
-            scoreboard.setScore("previous", 2)
-        }
-        if (news === "Clear") {
-            scoreboard.setScore("new", 0)
-        }
-        else if (news === "Rain") {
-            scoreboard.setScore("new", 1)
-        }
-        else {
-            scoreboard.setScore("new", 2)
-        }
-    }
-})
-
-world.afterEvents.playerButtonInput.subscribe((data) => {
-    const sender = data.player
-    const button = data.button
-    const newbutton = data.newButtonState
-    if (button === InputButton.Jump && newbutton === ButtonState.Pressed) {
-        if (world.scoreboard.getObjective("detect:input_jump_pressed") !== undefined) {
-            world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 1)
-            system.runTimeout(() => {
-                world.scoreboard.getObjective("detect:input_jump_pressed").setScore(sender, 0)
-            }, 1)
-        }
-    }
-    if (button === InputButton.Jump && newbutton === ButtonState.Released) {
-        if (world.scoreboard.getObjective("detect:input_jump_released") !== undefined) {
-            world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 1)
-            system.runTimeout(() => {
-                world.scoreboard.getObjective("detect:input_jump_released").setScore(sender, 0)
-            }, 1)
-        }
-    }
-    if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
-        if (world.scoreboard.getObjective("detect:input_sneak_pressed") !== undefined) {
-            world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 1)
-            system.runTimeout(() => {
-                world.scoreboard.getObjective("detect:input_sneak_pressed").setScore(sender, 0)
-            }, 1)
-        }
-    }
-    if (button === InputButton.Sneak && newbutton === ButtonState.Pressed) {
-        if (world.scoreboard.getObjective("detect:input_sneak_released") !== undefined) {
-            world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 1)
-            system.runTimeout(() => {
-                world.scoreboard.getObjective("detect:input_sneak_released").setScore(sender, 0)
-            }, 1)
         }
     }
 })
