@@ -32,7 +32,7 @@ system.beforeEvents.startup.subscribe((data) => {
     command.registerEnum("xs:startOption", ["build", "jump", "sneak", "interact", "fly", "glide", "swim", "use_item_in_slot", "use_item_in_slot_on_block", "respawn"])
     command.registerEnum("xs:weaponSlot", ["mainhand", "offhand", "head", "feet", "chest", "legs", "full_armor"])
     command.registerEnum("xs:itemOption", ["nametag", "lore"])
-    
+
     if (pack["command:clearchat"] === true) {
         command.registerCommand({
             name: "xs:clearchat",
@@ -603,16 +603,29 @@ system.beforeEvents.startup.subscribe((data) => {
                             const data = new globalIds("globalId", { name: target, id: id })
                             const bandata = new globalIds("banId", { name: target, id: id })
                             if (!bandata.DoesExistId()) {
-                                bandata.add()
                                 if (world.getPlayers().find(s => s.name === target)) {
                                     const player = world.getPlayers().find(s => s.name === target)
-                                    system.run(() => {
-                                        player.runCommand(`kick @s "§qaccount ban >> §c貴方はアクセスが禁止されました。"`)
-                                    })
+                                    if (player.playerPermissionLevel !== PlayerPermissionLevel.Operator) {
+                                        bandata.add()
+                                        system.run(() => {
+                                            player.runCommand(`kick @s "§qaccount ban >> §c貴方はアクセスが禁止されました。"`)
+                                        })
+                                        return {
+                                            status: CustomCommandStatus.Success,
+                                            message: `${target} のアクセスを禁止しました`
+                                        }
+                                    }
+                                    else return {
+                                        status: CustomCommandStatus.Failure,
+                                        message: `権限があるプレイヤーはbanできません`
+                                    }
                                 }
-                                return {
-                                    status: CustomCommandStatus.Success,
-                                    message: `${target} のアクセスを禁止しました`
+                                else {
+                                    bandata.add()
+                                    return {
+                                        status: CustomCommandStatus.Success,
+                                        message: `${target} のアクセスを禁止しました`
+                                    }
                                 }
                             }
                             else {
@@ -678,16 +691,29 @@ system.beforeEvents.startup.subscribe((data) => {
                         const data = new globalIds("globalId", { name: target, id: id })
                         const bandata = new globalIds("banId", { name: target, id: id })
                         if (!bandata.DoesExistId()) {
-                            bandata.add()
                             if (world.getPlayers().find(s => s.name === target)) {
                                 const player = world.getPlayers().find(s => s.name === target)
-                                system.run(() => {
-                                    player.runCommand(`kick @s "§qaccount ban >> §c貴方はアクセスが禁止されました。"`)
-                                })
+                                if (player.playerPermissionLevel !== PlayerPermissionLevel.Operator) {
+                                    bandata.add()
+                                    system.run(() => {
+                                        player.runCommand(`kick @s "§qaccount ban >> §c貴方はアクセスが禁止されました。"`)
+                                    })
+                                    return {
+                                        status: CustomCommandStatus.Success,
+                                        message: `${target} のアクセスを禁止しました`
+                                    }
+                                }
+                                else return {
+                                    status: CustomCommandStatus.Failure,
+                                    message: `権限があるプレイヤーはbanできません`
+                                }
                             }
-                            return {
-                                status: CustomCommandStatus.Success,
-                                message: `${target} のアクセスを禁止しました`
+                            else {
+                                bandata.add()
+                                return {
+                                    status: CustomCommandStatus.Success,
+                                    message: `${target} のアクセスを禁止しました`
+                                }
                             }
                         }
                         else {
@@ -769,16 +795,29 @@ system.beforeEvents.startup.subscribe((data) => {
                         if (id !== undefined) {
                             const bandata = new globalIds("nbanId", { name: target, id: id })
                             if (!bandata.DoesExistId()) {
-                                bandata.add()
                                 if (world.getPlayers().find(s => s.name === target)) {
                                     const player = world.getPlayers().find(s => s.name === target)
-                                    system.run(() => {
-                                        player.runCommand(`kick @s "§eban >> §c貴方はアクセスが禁止されました。"`)
-                                    })
+                                    if (player.playerPermissionLevel !== PlayerPermissionLevel.Operator) {
+                                        bandata.add()
+                                        system.run(() => {
+                                            player.runCommand(`kick @s "§eban >> §c貴方はアクセスが禁止されました。"`)
+                                        })
+                                        return {
+                                            status: CustomCommandStatus.Success,
+                                            message: `${target} のアクセスを禁止しました`
+                                        }
+                                    }
+                                    else return {
+                                        status: CustomCommandStatus.Failure,
+                                        message: `権限があるプレイヤーはbanできません`
+                                    }
                                 }
-                                return {
-                                    status: CustomCommandStatus.Success,
-                                    message: `${target} のアクセスを禁止しました`
+                                else {
+                                    bandata.add()
+                                    return {
+                                        status: CustomCommandStatus.Success,
+                                        message: `${target} のアクセスを禁止しました`
+                                    }
                                 }
                             }
                             else return {
@@ -829,16 +868,29 @@ system.beforeEvents.startup.subscribe((data) => {
                     if (id !== undefined) {
                         const bandata = new globalIds("banId", { name: target, id: id })
                         if (!bandata.DoesExistId()) {
-                            bandata.add()
                             if (world.getPlayers().find(s => s.name === target)) {
                                 const player = world.getPlayers().find(s => s.name === target)
-                                system.run(() => {
-                                    player.runCommand(`kick @s "§eban >> §c貴方はアクセスが禁止されました。"`)
-                                })
+                                if (player.playerPermissionLevel !== PlayerPermissionLevel.Operator) {
+                                    bandata.add()
+                                    system.run(() => {
+                                        player.runCommand(`kick @s "§eban >> §c貴方はアクセスが禁止されました。"`)
+                                    })
+                                    return {
+                                        status: CustomCommandStatus.Success,
+                                        message: `${target} のアクセスを禁止しました`
+                                    }
+                                }
+                                else return {
+                                    status: CustomCommandStatus.Failure,
+                                    message: `権限があるプレイヤーはbanできません`
+                                }
                             }
-                            return {
-                                status: CustomCommandStatus.Success,
-                                message: `${target} のアクセスを禁止しました`
+                            else {
+                                bandata.add()
+                                return {
+                                    status: CustomCommandStatus.Success,
+                                    message: `${target} のアクセスを禁止しました`
+                                }
                             }
                         }
                         else return {
