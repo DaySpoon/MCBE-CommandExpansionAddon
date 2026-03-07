@@ -1639,7 +1639,10 @@ system.beforeEvents.startup.subscribe((data) => {
                             if (entity instanceof Entity) {
                                 entity.removeEffect("health_boost")
                                 if (value > 0) entity.addEffect("health_boost", 20000000, { amplifier: value, showParticles: false })
-                                if (value > 0) entity.addEffect("instant_health", 1, { amplifier: 255, showParticles: false })
+                                if (value > 0) {
+                                    if (entity.matches({ families: ["undead"] })) entity.addEffect("instant_damage", 1, { amplifier: 255, showParticles: false })
+                                    else entity.addEffect("instant_health", 1, { amplifier: 255, showParticles: false })
+                                }
                             }
                         }
                     })
