@@ -1,29 +1,17 @@
 {
-	"format_version": 2,
+	"format_version": 3,
 	"header": {
-		"name": "§l§2Command Expansion",
-		"description": "製作者: DaySpoonKara (DaySpからあげ)\n更なる便利・操作コマンドを増やします。",
-		"min_engine_version": [
-			1,
-			20,
-			0
-		],
+		"name": "§l§2Command Expansion [V2.0]",
+		"description": "製作者: DaySpoonKara (DaySpからあげ)\n更なる便利・操作コマンドを増やします。V1.1：機能のOn/Offができる設定を追加しました。",
+		"min_engine_version": "1.20.0",
 		"uuid": "a92fca5e-68cc-4181-9453-16a00579aafe",
-		"version": [
-			1,
-			0,
-			0
-		]
+		"version": "2.0.0"
 	},
 	"modules": [
 		{
 			"type": "data",
 			"uuid": "83166e62-ff21-4cf2-80bb-47f366704096",
-			"version": [
-				1,
-				0,
-				0
-			]
+			"version": "2.0.0"
 		},
 		{
 			"description": "javascript",
@@ -31,11 +19,7 @@
 			"language": "javascript",
 			"uuid": "1540a2b8-cbcc-4ae7-92f2-22facbba24ad",
 			"entry": "scripts/main.js",
-			"version": [
-				1,
-				0,
-				0
-			]
+			"version": "2.0.0"
 		}
 	],
 	"capabilities": [
@@ -65,6 +49,264 @@
 		{
 			"module_name": "@minecraft/debug-utilities",
 			"version": "beta"
+		}
+	],
+	"settings": [
+		{
+			"type": "label",
+			"text": "ここの設定では、§l§eアドオンのカスタム§rが可能です。必要な機能のみをONにして追加することができます。"
+		},
+		{
+			"type": "label",
+			"text": "§b§l検知系"
+		},
+		{
+			"type": "toggle",
+			"text": "検知スコアボード機能",
+			"name": "command:detect_scoreboard",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/detect",
+			"name": "command:detect",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§c§l荒らし対策系"
+		},
+		{
+			"type": "toggle",
+			"text": "/get",
+			"name": "command:get",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/ban (4個含む)",
+			"name": "command:ban",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§e§l便利系"
+		},
+		{
+			"type": "toggle",
+			"text": "/clearchat",
+			"name": "command:clearchat",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/announce",
+			"name": "command:announce",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/wall",
+			"name": "command:wall",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/weapon",
+			"name": "command:weapon",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/health",
+			"name": "command:health",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/heal",
+			"name": "command:heal",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/feed",
+			"name": "command:feed",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§2§lコントロール系"
+		},
+		{
+			"type": "toggle",
+			"text": "/interact",
+			"name": "command:interact",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/knokback",
+			"name": "command:knokback",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/motion",
+			"name": "command:motion",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/velocity",
+			"name": "command:velocity",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/fire",
+			"name": "command:fire",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/extinguishfire",
+			"name": "command:extinguishfire",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/despawn",
+			"name": "command:despawn",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§v§lテレポート・外部系"
+		},
+		{
+			"type": "toggle",
+			"text": "/dimensiontp",
+			"name": "command:dimensiontp",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/swap",
+			"name": "command:swap",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/transfers",
+			"name": "command:transfers",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/worldproperty",
+			"name": "command:worldproperty",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§3§l描画系"
+		},
+		{
+			"type": "toggle",
+			"text": "/textprimitive (コマンド7個含む)",
+			"name": "command:textprimitive",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/client-particle",
+			"name": "command:client-particle",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/draw",
+			"name": "command:draw",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/cleardraw",
+			"name": "command:cleardraw",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§9§lbot系"
+		},
+		{
+			"type": "toggle",
+			"text": "/bot (bot系の操作含むコマンド9個)",
+			"name": "command:bot",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§a§l変更・生成系"
+		},
+		{
+			"type": "toggle",
+			"text": "/explode",
+			"name": "command:explode",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/maxhealth",
+			"name": "command:maxhealth",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/summonitem",
+			"name": "command:summonitem",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/nametag",
+			"name": "command:nametag",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/item",
+			"name": "command:item",
+			"default": true
+		},
+		{
+			"type": "label",
+			"text": "§7§lその他"
+		},
+		{
+			"type": "toggle",
+			"text": "/ping",
+			"name": "command:ping",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/seed",
+			"name": "command:seed",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/lead",
+			"name": "command:lead",
+			"default": true
+		},
+		{
+			"type": "toggle",
+			"text": "/lookat",
+			"name": "command:lookat",
+			"default": true
 		}
 	]
 }

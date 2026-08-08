@@ -808,6 +808,315 @@ export class globalIds {
     }
 }
 
+export class playersList {
+    /**
+     * 
+     * @param {string} playerName 
+     * @param {string} persistentId 
+     * @param {Array} playerData 
+     */
+    constructor(playerName = "", persistentId = "", playerData = null) {
+        this._name = playerName
+        this._persistentId = persistentId
+        this._playerData = []
+    }
+    static initialize() {
+        world.setDynamicProperty("data.playersList", JSON.stringify([]))
+        world.setDynamicProperty("data.banList", JSON.stringify([]))
+        return this
+    }
+    static write(obj, type = 0) {
+        if (type === 0) world.setDynamicProperty("data.playersList", JSON.stringify(obj))
+        if (type === 1) world.setDynamicProperty("data.banList", JSON.stringify(obj))
+        return this
+    }
+    static delete(index, type = 0) {
+        if (type === 0) {
+            let data = this.getPlayersList()
+            data.splice(index, 1)
+            this.write(data, type)
+        }
+        if (type === 1) {
+            let data = this.getBanList()
+            data.splice(index, 1)
+            this.write(data, type)
+        }
+        return this
+    }
+    /**
+     * 
+     * @returns {Array}
+     */
+    static getPlayersList() {
+        return JSON.parse(world.getDynamicProperty("data.playersList"))
+    }
+    /**
+     * 
+     * @returns {Array}
+     */
+    static getBanList() {
+        return JSON.parse(world.getDynamicProperty("data.banList"))
+    }
+    static checkPersistentId(persistentId = "") {
+        if (persistentId.length > 0) return true
+        else return false
+    }
+    static getPlayer(persistentId) {
+        if (this.checkPersistentId(persistentId)) {
+            const data = this.getPlayersList()
+            if (data.find(s => s.persistentId === persistentId)) {
+                const p = data.find(s => s.persistentId === persistentId)
+                return new playersList(p.name, p.persistentId, p.playerData)
+            }
+            else return undefined
+        }
+        else return undefined
+    }
+
+    static isValid() {
+        if (world.getDynamicProperty("data.playersList") === undefined) {
+            return false
+        }
+        else return true
+    }
+
+    static getPlayerFromName(name) {
+        const data = this.getPlayersList()
+        if (data.find(s => s.name === name)) {
+            const p = data.find(s => s.name === name)
+            return new playersList(p.name, p.persistentId, p.playerData)
+        }
+        else return undefined
+    }
+
+    static DoesExistPlayer(persistentId) {
+        const data = this.getPlayersList()
+        if (data.length) {
+            if (data.find(s => s.persistentId === persistentId)) {
+                return true
+            }
+            else return false
+        }
+        else return false
+    }
+
+    static addPlayer(name, persistentId, playerData = null) {
+        if (!this.DoesExistPlayer(persistentId)) {
+            const data = this.getPlayersList()
+            data.push({ name: name, persistentId: persistentId, playerData: playerData })
+            this.write(data)
+            return new playersList(name, persistentId, playerData)
+        }
+        else return undefined
+    }
+    static getAllPlayers() {
+        const datas = this.getPlayersList()
+        let ar = []
+        for (const p of datas) {
+            ar.push(new playersList(p.name, p.persistentId, p.playerData))
+        }
+        return ar
+    }
+    static getAllBanPlayers() {
+        const datas = this.getBanList()
+        let ar = []
+        for (const p of datas) {
+            ar.push(new playersList(p.name, p.persistentId, p.playerData))
+        }
+        return ar
+    }
+
+    isValid() {
+        const data = playersList.getPlayersList()
+        if (data.find(s => s.persistentId === this._persistentId)) return true;
+        else return false;
+    }
+
+    getPlayerData() {
+        return this._playerData
+    }
+
+    getName() {
+        return this._name
+    }
+
+    getPersistentId() {
+        return this._persistentId
+    }
+
+    setPlayerData(playerData = []) {
+        let data = playersList.getPlayersList()
+        const i = this.getplayersListIndex()
+        data[i].playerData = playerData
+        playersList.write(data, 0)
+        return new playersList(data[i].name, data[i].persistentId, playerData)
+    }
+
+    rename(name = "") {
+        let data = playersList.getPlayersList()
+        const i = this.getplayersListIndex()
+        data[i].name = name
+        playersList.write(data, 0)
+        return new playersList(name, data[i].persistentId, data[i].playerData)
+    }
+
+    remove() {
+        let data = playersList.getPlayersList()
+        const i = this.getplayersListIndex()
+        if (this.isValid()) {
+            playersList.delete(i, 0)
+            return true
+        }
+        else return false;
+    }
+
+    pardon() {
+        let data = playersList.getPlayersList()
+        if (this.hasBanned()) {
+            const i = this.getBanListIndex()
+            playersList.delete(i, 1)
+            return true;
+        }
+        else return false;
+    }
+
+    ban() {
+        let data = playersList.getBanList()
+        const i = this.getBanListIndex()
+        if (!this.hasBanned()) {
+            data.push({ name: this._name, persistentId: this._persistentId, data: [] })
+            playersList.write(data, 1)
+            return true;
+        }
+        return false;
+    }
+
+    getplayersListIndex() {
+        if (this.isValid()) {
+            const data = playersList.getPlayersList()
+            return data.findIndex(s => s.persistentId === this._persistentId)
+        }
+    }
+
+    getBanListIndex() {
+        const data = playersList.getBanList()
+        if (data.length) {
+            if (data.find(s => s.persistentId === this._persistentId)) {
+                return data.findIndex(s => s.persistentId === this._persistentId)
+            }
+            else return undefined
+        }
+        else return undefined
+    }
+
+    hasBanned() {
+        const data = playersList.getBanList()
+        if (data.length) {
+            if (data.find(s => s.persistentId === this._persistentId)) {
+                return true
+            }
+            else return false
+        }
+        else return false
+    }
+}
+
+export class queue {
+    constructor(id) {
+        this._id = id
+    }
+    static create(id) {
+        if (!this.isValid(id)) world.setDynamicProperty(`queue.${id}`, JSON.stringify([]))
+        return new queue(id)
+    }
+    /**
+     * 
+     * @returns {Array}
+     */
+    static get(id) {
+        if (this.isValid(id)) {
+            return JSON.parse(world.getDynamicProperty(`queue.${id}`))
+        } else return undefined
+    }
+    static isValid(id) {
+        if (world.getDynamicProperty(`queue.${id}`) === undefined) return false
+        else return true
+    }
+    static delete(id) {
+        if (this.isValid(id)) {
+            world.setDynamicProperty(`queue.${id}`)
+        }
+        else return undefined;
+    }
+    /**
+     * 
+     * @returns {Array}
+     */
+    get() {
+        if (this.isValid(this._id)) {
+            return JSON.parse(world.getDynamicProperty(`queue.${this._id}`))
+        } else return undefined
+    }
+    isValid() {
+        if (world.getDynamicProperty(`queue.${this._id}`) === undefined) return false
+        else return true
+    }
+    write(obj) {
+        if (this.isValid()) {
+            let d = this.get()
+            world.setDynamicProperty(`queue.${this._id}`, JSON.stringify(obj))
+        }
+        return this
+    }
+    has(name) {
+        if (this.isValid()) {
+            let d = this.get()
+            if (d.length) {
+                if (d.find(s => s === name)) {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+        else return false;
+    }
+    add(name) {
+        if (this.isValid()) {
+            let d = this.get()
+            if (!this.has(name)) d.push(name)
+            this.write(d)
+            return this;
+        }
+    }
+    remove(name) {
+        if (this.isValid()) {
+            let d = this.get()
+            if (this.has(name)) {
+                if (d.find(s => s === name)) {
+                    const i = d.findIndex(s => s === name)
+                    d.splice(i, 1)
+                    this.write(d)
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+        else return false;
+    }
+    list() {
+        if (this.isValid()) {
+            let d = this.get()
+            if (d.length) {
+                return d;
+            }
+            else return [];
+        }
+        else return [];
+    }
+}
+
 export class SPlayer {
     /**
      * 
